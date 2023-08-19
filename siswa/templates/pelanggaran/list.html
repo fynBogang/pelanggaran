@@ -1,0 +1,36 @@
+{% extends '../base.html' %} {% block content %}
+<div class="main-sparkline13-hd">
+  <h3>List Pelanggaran</h3>
+    <a href="{% url 'pelanggaran_create' %}" class="btn btn-sm btn-primary">Tambah Pelanggaran</a>
+  <hr>
+</div>
+<div class="table-responsive text-nowrap">
+  <table class="table">
+      <thead>
+        <tr>
+          {% comment %} <th>ID Pelanggaran</th> {% endcomment %}
+          <th>Nama Pelanggaran</th>
+          <th>Point Pelanggaran</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pelanggaran in pelanggaran %}
+        <tr>
+          {% comment %} <td>{{ pelanggaran.id_pelanggaran }}</td> {% endcomment %}
+          <td>{{ pelanggaran.nama_pelanggaran }}</td>
+          <td>{{ pelanggaran.point_pelanggaran }}</td>
+          <td>
+            <a class="edit-link btn btn-sm btn-primary" href="{% url 'pelanggaran_update' pelanggaran.id_pelanggaran %}">Edit</a>
+            <a class="delete-link btn btn-sm btn-danger" href="{% url 'pelanggaran_delete' pelanggaran.id_pelanggaran %}">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2">Tidak ada data pelanggaran.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endblock %}

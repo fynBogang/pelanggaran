@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Siswa</title>
+</head>
+<body>
+    <h1>Daftar Siswa</h1>
+    <ul>
+        {% for s in siswa %}
+        <li>{{ s.nama_lengkap }}</li>
+        {% empty %}
+        <li>Tidak ada data siswa.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

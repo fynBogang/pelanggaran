@@ -1,0 +1,64 @@
+{% extends '../base.html' %}
+{% block content %}
+<h3>List Siswa</h3>
+<a id="sync-button" class="btn btn-sm btn-success">Syncron Data Siswa</a>
+<a href="{% url 'create_siswa' %}" class="btn btn-sm btn-primary">Tambah Siswa</a>
+<a href="{% url 'import_excel' %}" class="btn btn-sm btn-secondary">Import Excel</a>
+<hr>
+<div class="table-responsive text-nowrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>NO IDK</th>
+        <th>Nama</th>
+        <th>TMP Lahir</th>
+        <th>TGL Lahir</th>
+        <th>JK</th>
+        <th>Kelas</th>
+        <th>Rombel</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+    <tbody id="siswa-data">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const syncButton = document.getElementById('sync-button');
+  const siswaData = document.getElementById('siswa-data');
+
+  syncButton.addEventListener('click', () => {
+    fetch('http://127.0.0.1:8000/api/siswa/?format=json')
+      .then(response => response.json())
+      .then(data => {
+        siswaData.innerHTML = '';
+
+        const siswaList = data;
+        siswaList.forEach(siswa => {
+          const row = document.createElement('tr');
+
+          const qrCodeUrl = `http://api.qrserver.com/v1/create-qr-code/?data=${siswa.nomor_induk}`;
+          const qrCodeCell = document.createElement('td');
+          const qrCodeImage = document.createElement('img');
+          qrCodeImage.src = qrCodeUrl;
+          qrCodeImage.alt = 'QR Code';
+          qrCodeCell.appendChild(qrCodeImage);
+
+          row.innerHTML = `
+            <td>${siswa.nomor_induk}</td>
+            <td>${siswa.nama_lengkap}</td>
+            <td>${siswa.tempat_lahir}</td>
+            <td>${siswa.tanggal_lahir}</td>
+            <td>${siswa.jenis_kelamin}</td>
+            <td>${siswa.kelas}</td>
+            <td>${siswa.rombel}</td>
+          `;
+
+          row.appendChild(qrCodeCell);
+          siswaData.appendChild(row);
+        });
+      });
+  });
+</script>
+{% endblock %}

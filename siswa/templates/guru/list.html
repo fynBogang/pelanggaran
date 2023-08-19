@@ -1,0 +1,39 @@
+{% extends '../base.html' %} {% block content %}
+<h3>List Petugas</h3>
+<a href="{% url 'guru_create' %}" class="btn btn-sm btn-success">Tambah Petugas</a>
+<hr>
+<div class="table-responsive text-nowrap">
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID Petugas</th>
+      <th>Nama Lengkap</th>
+      <th>Tanggal Lahir</th>
+      <th>NUPTK</th>
+      <th>Nomer HP</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for guru in guru %}
+    <tr>
+      <td>{{ guru.id_guru }}</td>
+      <td>{{ guru.nama_lengkap }}</td>
+      <td>{{ guru.tanggal_lahir }}</td>
+      <td>{{ guru.nuptk }}</td>
+      <td>{{ guru.nomer_hp }}</td>
+      <td>
+        <a href="{% url 'guru_update' guru.id %}" class="btn btn-primary btn-sm">Ubah</a>
+        <a href="{% url 'guru_delete' guru.id %}" class="btn btn-danger btn-sm">Hapus</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">Tidak ada data guru.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+              
+{% endblock %}

@@ -1,0 +1,49 @@
+{% load static %}
+<h1>Data Pelanggaran Siswa</h1>
+  <table class="table" id="data-table">
+    <thead>
+      <tr>
+        <th>Nomor Induk</th>
+        <th>Nama Siswa</th>
+        <th>Nama Pelanggaran</th>
+        <th>Point</th>
+        <th>Sanksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in siswa_pelanggaran_data %}
+        <tr>
+          <td>{{ data.siswa.nomor_induk }}</td>
+          <td>{{ data.siswa.nama_lengkap }}</td>
+          <td>{{ data.pelanggaran.nama_pelanggaran }}</td>
+          <td>{{ data.pelanggaran.point_pelanggaran }}</td>
+          <td>{{ data.sanksi }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <script src="{% static 'jspdf.umd.min.js' %}"></script>
+  <script>
+    function printTable() {
+      const doc = new jsPDF();
+      const table = document.getElementById('data-table');
+      const dataURL = tableToDataURL(table);
+  
+      doc.addImage(dataURL, 'PNG', 10, 10, 180, 0);
+  
+      doc.save('data_pelanggaran_siswa.pdf');
+    }
+  
+    function tableToDataURL(table) {
+      const tableClone = table.cloneNode(true);
+      tableClone.id = 'data-table-clone';
+      document.body.appendChild(tableClone);
+  
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(tableClone);
+  
+      document.body.removeChild(tableClone);
+  
+      return 'data:image/svg+xml;base64,' + btoa(svgString);
+    }
+  </script>

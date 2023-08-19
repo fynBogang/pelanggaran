@@ -1,0 +1,229 @@
+{% extends '../base.html' %} {% block content %}
+<div class="data-table-area mg-b-15">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="sparkline13-list">
+          <div class="sparkline13-hd">
+            <div class="main-sparkline13-hd">
+              <h1>List Data Pelanggaran</h1>
+            </div>
+          </div>
+          <div class="sparkline13-graph">
+            <div class="datatable-dashv1-list custom-datatable-overright">
+              <input
+                type="file"
+                accept="image/*"
+                capture="camera"
+                id="file-input"
+              />
+              <button onclick="scanFromImage()">Scan from Image</button>
+              <div class="camera-toggle">
+                <label for="camera-toggle">Camera:</label>
+                <input type="checkbox" id="camera-toggle" checked />
+              </div>
+              <div id="scanner-container"></div>
+              <div id="barcode-data"></div>
+              <select id="pelanggaran-select">
+                {% for pelanggaran in pelanggaran_list %}
+                <option value="{{ pelanggaran.nama_pelanggaran }}">
+                  {{ pelanggaran.nama_pelanggaran }}
+                </option>
+                {% endfor %}
+              </select>
+              <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
+              <script>
+                var cameraToggle = document.getElementById("camera-toggle");
+                var isCameraEnabled = true;
+
+                cameraToggle.addEventListener("change", function () {
+                  isCameraEnabled = this.checked;
+                  if (isCameraEnabled) {
+                    Quagga.start();
+                  } else {
+                    Quagga.stop();
+                  }
+                });
+
+                function scanFromImage() {
+                  var fileInput = document.getElementById("file-input");
+                  fileInput.onchange = function () {
+                    var file = fileInput.files[0];
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (e) {
+                      var image = new Image();
+                      image.src = e.target.result;
+                      image.onload = function () {
+                        var canvas = document.createElement("canvas");
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        var context = canvas.getContext("2d", {
+                          willReadFrequently: true,
+                        });
+                        context.drawImage(
+                          image,
+                          0,
+                          0,
+                          image.width,
+                          image.height
+                        );
+                        var imageData = context.getImageData(
+                          0,
+                          0,
+                          image.width,
+                          image.height
+                        );
+                        Quagga.decodeSingle(
+                          {
+                            decoder: {
+                              readers: ["code_39_reader"],
+                            },
+                            locate: true,
+                            src: canvas.toDataURL("image/png"),
+                            numOfWorkers: 0,
+                            inputStream: {
+                              size: 800,
+                            },
+                            locator: {
+                              halfSample: true,
+                              patchSize: "medium",
+                            },
+                          },
+                          function (result) {
+                            if (result && result.codeResult) {
+                              var barcodeData = result.codeResult.code;
+                              var barcodeElement =
+                                document.getElementById("barcode-data");
+                              barcodeElement.innerHTML =
+                                "Scanned Barcode: " + barcodeData;
+                            } else {
+                              alert("No barcode detected");
+                            }
+                          }
+                        );
+                      };
+                    };
+                    fileReader.readAsDataURL(file);
+                  };
+                  fileInput.click();
+                }
+
+                Quagga.init(
+                  {
+                    inputStream: {
+                      name: "Live",
+                      type: "LiveStream",
+                      target: document.querySelector("#scanner-container"),
+                      constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment", // or "user" for front camera
+                      },
+                    },
+                    decoder: {
+                      readers: ["code_39_reader"],
+                    },
+                  },
+                  function (err) {
+                    if (err) {
+                      console.error(err);
+                      return;
+                    }
+                    if (isCameraEnabled) {
+                      Quagga.start();
+                    }
+                  }
+                );
+
+                Quagga.onDetected(function (result) {
+                  console.log(result);
+                  var barcodeData = result.codeResult.code;
+                  var barcodeElement = document.getElementById("barcode-data");
+                  barcodeElement.innerHTML = "Scanned Barcode: " + barcodeData;
+                  Quagga.stop();
+                });
+
+                // Drag and drop image handling
+                var dropArea = document.body;
+                dropArea.addEventListener("dragenter", preventDefault, false);
+                dropArea.addEventListener("dragleave", preventDefault, false);
+                dropArea.addEventListener("dragover", preventDefault, false);
+                dropArea.addEventListener("drop", handleDrop, false);
+
+                function preventDefault(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+
+                function handleDrop(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  var files = e.dataTransfer.files;
+                  if (files.length > 0) {
+                    var file = files[0];
+                    var fileReader = new FileReader();
+                    fileReader.onload = function (event) {
+                      var image = new Image();
+                      image.src = event.target.result;
+                      image.onload = function () {
+                        var canvas = document.createElement("canvas");
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        var context = canvas.getContext("2d", {
+                          willReadFrequently: true,
+                        });
+                        context.drawImage(
+                          image,
+                          0,
+                          0,
+                          image.width,
+                          image.height
+                        );
+                        var imageData = context.getImageData(
+                          0,
+                          0,
+                          image.width,
+                          image.height
+                        );
+                        Quagga.decodeSingle(
+                          {
+                            decoder: {
+                              readers: ["code_39_reader"],
+                            },
+                            locate: true,
+                            src: canvas.toDataURL("image/png"),
+                            numOfWorkers: 0,
+                            inputStream: {
+                              size: 800,
+                            },
+                            locator: {
+                              halfSample: true,
+                              patchSize: "medium",
+                            },
+                          },
+                          function (result) {
+                            if (result && result.codeResult) {
+                              var barcodeData = result.codeResult.code;
+                              var barcodeElement =
+                                document.getElementById("barcode-data");
+                              barcodeElement.innerHTML =
+                                "Scanned Barcode: " + barcodeData;
+                            } else {
+                              alert("No barcode detected");
+                            }
+                          }
+                        );
+                      };
+                    };
+                    fileReader.readAsDataURL(file);
+                  }
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

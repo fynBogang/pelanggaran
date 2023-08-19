@@ -1,0 +1,22 @@
+{% extends '../base.html' %}
+{% block content %}
+<form class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload" method="GET">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="nomor_induk">MASUKKAN NOMOR INDUK :</label>
+        <input type="text" class="form-control" name="nomor_induk" id="nomor_induk" required>
+    </div>
+    <br>
+    <input type="submit" class="btn btn-success" value="Cari Siswa">
+</form>
+
+<script>
+    document.getElementById('demo1-upload').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        var nomorInduk = document.getElementById('nomor_induk').value; // Get the value of nomor_induk
+        var url = "{% url 'barcode_scanner' nomor_induk='__VALUE__' %}";
+        url = url.replace('__VALUE__', nomorInduk); // Replace '__VALUE__' with the actual nomorInduk
+        window.location.href = url; // Redirect to the generated URL
+    });
+</script>
+{% endblock %}

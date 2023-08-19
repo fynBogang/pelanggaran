@@ -1,0 +1,6 @@
+{% for data in siswa %}
+    <div>
+        <p>Siswa: {{ data.nama }}</p>
+        <img src="{{ data.barcode_image.url }}" alt="Barcode">
+    </div>
+{% endfor %}

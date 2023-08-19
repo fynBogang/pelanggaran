@@ -1,0 +1,55 @@
+{% extends '../base.html' %}
+{% block content %}
+
+<form action="{% url 'add_pelanggaran' %}" class="dropzone dropzone-custom needsclick add-professors" id="demo1-upload"
+    method="POST">
+    {% csrf_token %}
+    {% for item in siswa %}
+    <div class="form-group">
+        <label for="">NOMOR INDUK :</label>
+        <input type="number" class="form-control" name="nomor_induk" value="{{ item.nomor_induk|upper }}" readonly>
+        <input type="hidden" class="form-control" name="id_siswa" value="{{ item.id|upper }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="">NAMA LENGKAP :</label>
+        <input type="text" class="form-control" name="nama_lengkap" value="{{ item.nama_lengkap|upper }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="">KELAS :</label>
+        <input type="text" class="form-control" name="kelas" value="{{ item.kelas|upper }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="">JURUSAN :</label>
+        <input type="text" class="form-control" name="jurusan" value="{{ item.jurusan|upper }}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="">PELANGGARAN SISWA :</label>
+        <select name="nama_pelanggaran" id="nama_pelanggaran" class="form-control">
+          <option value=""> -- Pilih Salah Satu --</option>
+            {% for item in pelanggaran_list %}
+              <option value="{{ item.id_pelanggaran }}" data-point="{{ item.point_pelanggaran }}">
+                {{ item.nama_pelanggaran }}
+              </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+      <label for="">POINT PELANGGARAN :</label>
+      <input type="text" class="form-control" name="point_pelanggaran" id="point_pelanggaran" readonly>
+    </div>
+    <br>
+    {% endfor %}
+    <input type="submit" class="btn btn-success" value="Save">
+</form>
+
+
+<script>
+    // JavaScript code to update the point_pelanggaran field based on the selected nama_pelanggaran
+  document.getElementById('nama_pelanggaran').addEventListener('change', function() {
+    var selectedOption = this.options[this.selectedIndex
+    ];
+    var pointPelanggaran = selectedOption.getAttribute('data-point');
+    document.getElementById('point_pelanggaran').value = pointPelanggaran;
+});
+</script>
+{% endblock %}

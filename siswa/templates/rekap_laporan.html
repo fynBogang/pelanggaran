@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h3>Rekap Laporan</h3>
+  <hr>
+  <a href="{% url 'cetak_semua_laporan' %}" target="_blank" class="btn btn-primary">Cetak Semua Laporan</a>
+  <button onclick="exportToExcel()" class="btn btn-primary">Download Excel</button>
+  <table class="table" id="data-table">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Nomor Induk</th>
+        <th>Nama Siswa</th>
+        <th>Nama Pelanggaran</th>
+        <th>Point</th>
+        <th>Sanksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in siswa_pelanggaran_data %}
+        <tr>
+          <td>{{ data.tanggal }}</td>
+          <td>{{ data.siswa.nomor_induk }}</td>
+          <td>{{ data.siswa.nama_lengkap }}</td>
+          <td>{{ data.pelanggaran.nama_pelanggaran }}</td>
+          <td>{{ data.pelanggaran.point_pelanggaran }}</td>
+          <td>{{ data.sanksi }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+<!-- ... your table and other content ... -->
+<script>
+  function exportToExcel() {
+    const table = document.getElementById('data-table');
+    const tableData = getTableData(table);
+    
+    // Send the table data to the Django view via AJAX
+    fetch('{% url "export_to_excel" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: JSON.stringify({ data: tableData }),
+    })
+      .then(response => response.blob())
+      .then(blob => {
+        // Create a URL for the blob data
+        const url = URL.createObjectURL(blob);
+        
+        // Create a link element to download the Excel file
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data_pelanggaran_siswa.xlsx';
+        document.body.appendChild(a);
+        
+        // Trigger the download
+        a.click();
+        
+        // Cleanup
+        URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Error exporting to Excel:', error);
+      });
+  }
+
+  function getTableData(table) {
+    const data = [];
+    const rows = table.querySelectorAll('tr');
+
+    for (const row of rows) {
+      const rowData = [];
+      const cells = row.querySelectorAll('td');
+
+      for (const cell of cells) {
+        rowData.push(cell.textContent);
+      }
+
+      data.push(rowData);
+    }
+
+    return data;
+  }
+</script>
+{% endblock %}

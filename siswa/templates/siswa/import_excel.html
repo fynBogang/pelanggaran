@@ -1,0 +1,12 @@
+{% extends '../base.html' %}
+{% block content %}
+<h3>Import Data from Excel</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="excel_file">Excel File:</label>
+        <input type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+{% endblock %}
